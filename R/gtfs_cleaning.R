@@ -225,7 +225,10 @@ gtfs_clean <- function(gtfs, public_only =  FALSE) {
   gtfs$stop_times <- gtfs$stop_times[gtfs$stop_times$stop_id %in% unique(gtfs$stops$stop_id), ]
 
   # 2 Remove trips with less than two stops
-  stop_count <- gtfs$stop_times[, .N, by = "trip_id"]
+  stop_count <- gtfs$stop_times
+  stop_count <- data.table::as.data.table(stop_count)
+  stop_count <- stop_count[, .N, by = "trip_id"]
+
   gtfs$trips <- gtfs$trips[!("trip_id" %in% stop_count[N<2]$trip_id)]
 
   # 3 Remove stops that are never used

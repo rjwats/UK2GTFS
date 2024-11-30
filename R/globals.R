@@ -23,7 +23,8 @@ utils::globalVariables(c(
   'Public Departure Time','STP', 'Scheduled Arrival Time', 'Scheduled Departure Time',
   'Train Category', 'V1', '_TEMP_', '__TEMP__', 'duration',
   'i.friday', 'i.monday', 'i.saturday', 'i.sunday', 'i.thursday', 'i.tuesday', 'i.wednesday', 'originalUID',
-  'route_id_new', 'route_type', 'service_id', 'service_id_new', 'stop_name', 'trip_id_new'
+  'route_id_new', 'route_type', 'service_id', 'service_id_new', 'stop_name', 'trip_id_new',
+  'runs_total','weekday','band_hours','routes'
 ))
 
 

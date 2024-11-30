@@ -26,7 +26,7 @@ gtfs_merge <- function(gtfs_list, force = FALSE, quiet = TRUE, condenseServicePa
   flattened <- lapply( flattened, function(item)
     {
       if ( inherits(item, "data.table" ) ) return (item)
-      return (data.table(item))
+      return (data.table::data.table(item))
     } )
 
   #get unique input table names
@@ -50,7 +50,7 @@ gtfs_merge <- function(gtfs_list, force = FALSE, quiet = TRUE, condenseServicePa
     names(matched) <- seq(1, length(matched))
 
     #add a column to the data frame containing this unique number
-    suppressWarnings(matched <- dplyr::bind_rows(matched, .id = "file_id"))
+    # suppressWarnings(matched <- dplyr::bind_rows(matched, .id = "file_id"))
     matched$file_id <- as.integer(matched$file_id)
 
     #if("calendar_dates"==tableName)
@@ -274,51 +274,55 @@ gtfs_merge <- function(gtfs_list, force = FALSE, quiet = TRUE, condenseServicePa
   # we need to guard against this to make sure we don't end up putting null values into any key fields
   # This documentation https://gtfs.org/schedule/reference/#calendar_datestxt specifically mentions calendar dates without calendars
   # as being a legitimate way to construct the data.
-  if (condenseServicePatterns && nrow(calendar_dates) > 0) {
-    if(!quiet){message("Condensing duplicated service patterns")}
+  if(!is.null(nrow(calendar_dates))){
+    if (condenseServicePatterns && nrow(calendar_dates) > 0) {
+      if(!quiet){message("Condensing duplicated service patterns")}
 
-    #find every unique combination of calendar_dates and calendar values
-    calendar_dates_summary <- dplyr::group_by(calendar_dates, service_id)
-    if( inherits(calendar_dates_summary$date, "Date") ){
-      calendar_dates_summary <- dplyr::summarise(calendar_dates_summary,
-                                                 pattern = paste(c(as.character(date), exception_type), collapse = "")
+      #find every unique combination of calendar_dates and calendar values
+      calendar_dates_summary <- dplyr::group_by(calendar_dates, service_id)
+      if( inherits(calendar_dates_summary$date, "Date") ){
+        calendar_dates_summary <- dplyr::summarise(calendar_dates_summary,
+                                                   pattern = paste(c(as.character(date), exception_type), collapse = "")
+        )
+      } else {
+        calendar_dates_summary <- dplyr::summarise(calendar_dates_summary,
+                                                   pattern = paste(c(date, exception_type), collapse = "")
+        )
+      }
+
+      #we want to keep all rows in calendar_dates even if they don't have a row in calendar
+      calendar_summary <- dplyr::full_join(calendar, calendar_dates_summary, by = "service_id")
+      calendar_summary <- dplyr::group_by(
+        calendar_summary,
+        start_date, end_date, monday, tuesday, wednesday,
+        thursday, friday, saturday, sunday, pattern
       )
-    } else {
-      calendar_dates_summary <- dplyr::summarise(calendar_dates_summary,
-                                                 pattern = paste(c(date, exception_type), collapse = "")
-      )
+
+      #give every unique combination of dates / days / exceptions a new distinct service ID
+      calendar_summary$service_id_new <- dplyr::group_indices(calendar_summary)
+      calendar_summary <- calendar_summary[, c("service_id_new", "service_id")]
+
+      retainedColumnNames <- colnames(trips)[!(colnames(trips) %in% c("service_id", "route_id"))]
+      trips <- dplyr::left_join(trips, calendar_summary, by = c("service_id"))
+      trips <- trips[, c("route_id", "service_id_new", retainedColumnNames), with=FALSE]
+      trips <- trips %>% dplyr::rename(service_id = service_id_new)
+
+      retainedColumnNames <- colnames(calendar)[!(colnames(calendar) %in% c("service_id", "file_id"))]
+      calendar <- dplyr::left_join(calendar, calendar_summary, by = c("service_id"))
+      calendar <- calendar[, c("service_id_new", retainedColumnNames), with=FALSE]
+      calendar <- calendar %>% dplyr::rename(service_id = service_id_new)
+      calendar <- calendar[!duplicated(calendar$service_id), ]
+
+      retainedColumnNames <- colnames(calendar_dates)[!(colnames(calendar_dates) %in% c("service_id", "file_id"))]
+      calendar_dates <- dplyr::left_join(calendar_dates, calendar_summary, by = c("service_id"))
+      calendar_dates <- calendar_dates[, c("service_id_new", retainedColumnNames), with=FALSE]
+      calendar_dates <- calendar_dates %>% dplyr::rename(service_id = service_id_new)
+      calendar_dates <- calendar_dates[!duplicated(calendar_dates$service_id), ]
     }
-
-    #we want to keep all rows in calendar_dates even if they don't have a row in calendar
-    calendar_summary <- dplyr::full_join(calendar, calendar_dates_summary, by = "service_id")
-    calendar_summary <- dplyr::group_by(
-      calendar_summary,
-      start_date, end_date, monday, tuesday, wednesday,
-      thursday, friday, saturday, sunday, pattern
-    )
-
-    #give every unique combination of dates / days / exceptions a new distinct service ID
-    calendar_summary$service_id_new <- dplyr::group_indices(calendar_summary)
-    calendar_summary <- calendar_summary[, c("service_id_new", "service_id")]
-
-    retainedColumnNames <- colnames(trips)[!(colnames(trips) %in% c("service_id", "route_id"))]
-    trips <- dplyr::left_join(trips, calendar_summary, by = c("service_id"))
-    trips <- trips[, c("route_id", "service_id_new", retainedColumnNames), with=FALSE]
-    trips <- trips %>% dplyr::rename(service_id = service_id_new)
-
-    retainedColumnNames <- colnames(calendar)[!(colnames(calendar) %in% c("service_id", "file_id"))]
-    calendar <- dplyr::left_join(calendar, calendar_summary, by = c("service_id"))
-    calendar <- calendar[, c("service_id_new", retainedColumnNames), with=FALSE]
-    calendar <- calendar %>% dplyr::rename(service_id = service_id_new)
-    calendar <- calendar[!duplicated(calendar$service_id), ]
-
-    retainedColumnNames <- colnames(calendar_dates)[!(colnames(calendar_dates) %in% c("service_id", "file_id"))]
-    calendar_dates <- dplyr::left_join(calendar_dates, calendar_summary, by = c("service_id"))
-    calendar_dates <- calendar_dates[, c("service_id_new", retainedColumnNames), with=FALSE]
-    calendar_dates <- calendar_dates %>% dplyr::rename(service_id = service_id_new)
-    calendar_dates <- calendar_dates[!duplicated(calendar_dates$service_id), ]
+  } else {
+    #TODO: should off this option
+    message("No calendar_dates, skipping condensing service pattern")
   }
-
 
   # shapes in a BODS extract are keyed on a UUID type string, so fairly improbable that the keys collide unless it's actually the same object
   composite_key <- paste0(shapes$shape_id, shapes$shape_pt_sequence, sep = "#")

@@ -193,6 +193,7 @@ gtfs_trim_dates <- function(gtfs,
 #' @param enddate End date
 #' @param zone_id Which column in `zone` is the ID column
 #' @param by_mode logical, disaggregate by mode?
+#' @param ncores numeric, how many cores to use in parallel processing
 #'
 #' @export
 gtfs_trips_per_zone <- function(gtfs,
@@ -200,7 +201,8 @@ gtfs_trips_per_zone <- function(gtfs,
                                 startdate = min(gtfs$calendar$start_date),
                                 enddate = min(gtfs$calendar$start_date) + 31,
                                 zone_id = 1,
-                                by_mode = TRUE){
+                                by_mode = TRUE,
+                                ncores = 1){
 
   if(!sf::st_is_longlat(zone)){
     message("Transforming zones to 4326")
@@ -334,7 +336,7 @@ gtfs_trips_per_zone <- function(gtfs,
 
   res <- dplyr::group_by(stop_times, zone_id)
   res <- dplyr::group_split(res)
-  future::plan(future::multisession)
+  future::plan(future::multisession, workers = ncores)
   #res <- future.apply::future_lapply(res, internal_trips_per_zone, by_mode, days_tot)
   res <- furrr::future_map(.x = res,
                            .f = internal_trips_per_zone,

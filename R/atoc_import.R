@@ -362,7 +362,7 @@ importMCA <- function(file,
     col_types = rep("character", 8),
     widths = c(2, 4, 5, 2, 1, 8, 1, 57)
   )
-  setDT(BX)
+  data.table::setDT(BX)
   names(BX) <- c(
     "Record Identity", "Traction Class", "UIC Code", "ATOC Code",
     "Applicable Timetable Code", "Retail Train ID", "Source", "Spare"
@@ -387,7 +387,7 @@ importMCA <- function(file,
     col_types = rep("character", 12),
     widths = c(2, 7, 1, 5, 4, 3, 3, 2, 2, 12, 2, 37)
   )
-  setDT(LO)
+  data.table::setDT(LO)
   names(LO) <- c(
     "Record Identity", "Location", "Suffix", "Scheduled Departure Time",
     "Public Departure Time", "Platform", "Line", "Engineering Allowance",
@@ -413,7 +413,7 @@ importMCA <- function(file,
     col_types = rep("character", 16),
     widths = c(2, 7, 1, 5, 5, 5, 4, 4, 3, 3, 3, 12, 2, 2, 2, 20)
   )
-  setDT(LI)
+  data.table::setDT(LI)
   names(LI) <- c(
     "Record Identity", "Location", "Suffix", "Scheduled Arrival Time",
     "Scheduled Departure Time", "Scheduled Pass", "Public Arrival Time",
@@ -439,7 +439,7 @@ importMCA <- function(file,
     col_types = rep("character", 9),
     widths = c(2, 7, 1, 5, 4, 3, 3, 12, 43)
   )
-  setDT(LT)
+  data.table::setDT(LT)
   names(LT) <- c(
     "Record Identity", "Location", "Suffix", "Scheduled Arrival Time",
     "Public Arrival Time", "Platform", "Path", "Activity", "Spare"
@@ -468,7 +468,7 @@ importMCA <- function(file,
         4, 4, 5, 8, 5
       )
     )
-    setDT(CR)
+    data.table::setDT(CR)
     names(CR) <- c(
       "Record Identity", "Location", "Train Category", "Train Identity",
       "Headcode", "Course Indicator",
@@ -494,7 +494,7 @@ importMCA <- function(file,
       col_types = rep("character", 11),
       widths = c(2, 7, 2, 6, 1, 26, 5, 4, 3, 16, 8)
     )
-    setDT(TI)
+    data.table::setDT(TI)
     names(TI) <- c(
       "Record Identity", "TIPLOC code", "Capitals", "NALCO",
       "NLC Check Character", "TPS Description",
@@ -517,7 +517,7 @@ importMCA <- function(file,
       col_types = rep("character", 12),
       widths = c(2, 7, 2, 6, 1, 26, 5, 4, 3, 16, 7, 1)
     )
-    setDT(TA)
+    data.table::setDT(TA)
     names(TA) <- c(
       "Record Identity", "TIPLOC code", "Capitals", "NALCO",
       "NLC Check Character", "TPS Description", "STANOX", "PO MCP Code",
@@ -603,7 +603,7 @@ importMCA <- function(file,
       col_types = rep("character", 2),
       widths = c(2, 78)
     )
-    setDT(ZZ)
+    data.table::setDT(ZZ)
     names(ZZ) <- c("Record Identity", "Spare")
     ZZ$Spare <- NULL
     ZZ <- strip_whitespace(ZZ)
@@ -613,7 +613,7 @@ importMCA <- function(file,
   } else {
     # Trailer Record Missing
     ZZ <- data.frame(`Record Identity` = "ZZ", `Spare` = "")
-    setDT(ZZ)
+    data.table::setDT(ZZ)
     names(ZZ) <- c("Record Identity", "Spare")
     ZZ$rowID = length(types) + 1
   }
@@ -646,8 +646,8 @@ importMCA <- function(file,
 
   # the BX record appears the row after the BS record, so it's rowId is one more than it's corresponding BS record.
   # use this to join the two records together.
-  set(BX, j = "rowID", value = BX$rowID - 1)
-  setnames(BX, "rowID", "rowIDm1")
+  data.table::set(BX, j = "rowID", value = BX$rowID - 1)
+  data.table::setnames(BX, "rowID", "rowIDm1")
   schedule <- dplyr::left_join(BS, BX, by = c("rowID" = "rowIDm1"))
 
   if (full_import) {

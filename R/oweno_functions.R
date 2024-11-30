@@ -26,20 +26,25 @@ duplicateItems <- function( dt, split_attribute, ncores=1, indexStart=1 )
 
 
   if (ncores == 1) {
-    duplicates <- pbapply::pblapply(dt_split, duplicate_int)
+    #duplicates <- pbapply::pblapply(dt_split, duplicate_int)
+    duplicates <- purrr::map(dt_split, duplicate_int)
   } else {
-    cl <- parallel::makeCluster(ncores)
-    parallel::clusterEvalQ(cl, {
-      #put any setup required for all worker processes in here
-      options( UK2GTFS_opt_updateCachedDataOnLibaryLoad = FALSE )
-      loadNamespace("UK2GTFS")
-    })
+    # cl <- parallel::makeCluster(ncores)
+    # parallel::clusterEvalQ(cl, {
+    #   #put any setup required for all worker processes in here
+    #   options( UK2GTFS_opt_updateCachedDataOnLibaryLoad = FALSE )
+    #   loadNamespace("UK2GTFS")
+    # })
+    #
+    # duplicates <- pbapply::pblapply(dt_split,
+    #                                 duplicate_int,
+    #                                 cl = cl)
+    # parallel::stopCluster(cl)
+    # rm(cl)
+    future::plan(future::multisession, workers = ncores)
+    duplicates <- furrr::future_map(dt_split, duplicate_int)
+    future::plan(future::sequential)
 
-    duplicates <- pbapply::pblapply(dt_split,
-                                    duplicate_int,
-                                    cl = cl)
-    parallel::stopCluster(cl)
-    rm(cl)
   }
 
   duplicates <- data.table::rbindlist(duplicates, use.names=FALSE)
@@ -136,7 +141,8 @@ duplicate_related_items <- function(calendar, related_items, original_join_field
     new_join_ids <- dplyr::mutate(new_join_ids, Index = seq(0, dplyr::n()-1))
     new_join_ids <- as.data.frame( new_join_ids[, c("rowID", new_join_field, "Index")] )
 
-    related_items_dup <- dplyr::left_join(related_items_dup, new_join_ids, by = setNames(c("rowID","Index"),c(original_join_field,"index")) )
+    related_items_dup <- dplyr::left_join(related_items_dup, new_join_ids,
+                                          by = stats::setNames(c("rowID","Index"),c(original_join_field,"index")) )
 
     #select columns required
     related_items_dup <- related_items_dup[, outputColumnNames, with=FALSE]
@@ -148,7 +154,8 @@ duplicate_related_items <- function(calendar, related_items, original_join_field
   # this only applies to the non-duplicated rows
   # Join via rowID to determine the trip_id
   related_ids_nodup <- calendar.nodup[, c("rowID", new_join_field), with=FALSE]
-  related_items_no_dup <- dplyr::left_join(related_items, related_ids_nodup, by = setNames("rowID",original_join_field))
+  related_items_no_dup <- dplyr::left_join(related_items, related_ids_nodup,
+                                           by = stats::setNames("rowID",original_join_field))
   related_items_no_dup <- related_items_no_dup[!is.na(related_items_no_dup[[new_join_field]]), ]
 
 
@@ -366,7 +373,7 @@ getCachedLocationData <- function(locations = "tiplocs")
     stops <- cbind(locations, sf::st_coordinates(locations))
     stops <- sf::st_drop_geometry(stops)
     stops <- as.data.table(stops)
-    setnames(stops, old = c("Y", "X"), new = c("stop_lat", "stop_lon"))
+    data.table::setnames(stops, old = c("Y", "X"), new = c("stop_lat", "stop_lon"))
   }
   else #TODO test column names
   {

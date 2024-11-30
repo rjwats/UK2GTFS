@@ -22,7 +22,8 @@ get_naptan <- function(url = "https://naptan.api.dft.gov.uk/v1/access-nodes?data
 
   tryCatch({
     utils::download.file(url = url, destfile = "temp_naptan/Stops.csv", mode = "wb", quiet = TRUE)
-    naptan <- readr::read_csv("temp_naptan/Stops.csv", progress = FALSE, show_col_types = FALSE)
+    #naptan <- readr::read_csv("temp_naptan/Stops.csv", progress = FALSE, show_col_types = FALSE)
+    naptan <- data.table::fread("temp_naptan/Stops.csv")
   }, finally = {
     unlink("temp_naptan", recursive = TRUE)
   })

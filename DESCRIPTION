@@ -34,7 +34,6 @@ Imports:
   iotools,
   lubridate,
   purrr (>= 1.0),
-  readr (>= 2.0),
   RcppSimdJson,
   stringr,
   stringi,
