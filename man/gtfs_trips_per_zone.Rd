@@ -10,7 +10,8 @@ gtfs_trips_per_zone(
   startdate = min(gtfs$calendar$start_date),
   enddate = min(gtfs$calendar$start_date) + 31,
   zone_id = 1,
-  by_mode = TRUE
+  by_mode = TRUE,
+  ncores = 1
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ gtfs_trips_per_zone(
 \item{zone_id}{Which column in `zone` is the ID column}
 
 \item{by_mode}{logical, disaggregate by mode?}
+
+\item{ncores}{numeric, how many cores to use in parallel processing}
 }
 \description{
 Trim a GTFS file between two dates

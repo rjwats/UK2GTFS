@@ -346,7 +346,7 @@ gtfs_trips_per_zone <- function(gtfs,
   future::plan(future::sequential)
 
 
-  res <- collapse::unlist2d(res)
+  res <- dplyr::bind_rows(res)
   res$`.id` <- NULL
   res[2:ncol(res)] <- lapply(res[2:ncol(res)],function(x){ifelse(is.na(x),0,x)})
 

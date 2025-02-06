@@ -22,7 +22,6 @@ LazyDataCompression: gzip
 Imports:
   checkmate,
   calendar,
-  collapse,
   data.table,
   dodgr,
   dplyr,

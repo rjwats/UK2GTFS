@@ -126,7 +126,8 @@ transxchange_export <- function(obj,
     if(nrow(vj_so_do) > 0){
       vj_so_do <- dplyr::left_join(vj_so_do, ServicedOrganisations,
                                    by = c("ServicedDaysOfOperation" = "OrganisationCode",
-                                          "ServicedDaysOfOperationType" = "Type"))
+                                          "ServicedDaysOfOperationType" = "Type"),
+                                   relationship = "many-to-many")
       vj_so_do <- vj_so_do[,c("VehicleJourneyCode", "StartDate", "EndDate")]
       vj_so_do <- vj_so_do[!is.na(vj_so_do$StartDate),]
     } else {
