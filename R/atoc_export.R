@@ -458,7 +458,7 @@ clean_activities2 <- function(x, public_only = TRUE) {
 
   if (public_only)
   {
-    data(activity_codes)
+    utils::data(activity_codes)
 
     x <- dplyr::left_join(x, activity_codes, by = c("activity"))
     if (anyNA(x$pickup_type)) {
