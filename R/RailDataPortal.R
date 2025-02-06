@@ -98,3 +98,29 @@ nrdp_fares = function(destfile = "fares.zip",
 
 }
 
+nrdp_routing = function(destfile = "routeing.zip",
+                      username = Sys.getenv("NRDP_username"),
+                      password = Sys.getenv("NRDP_password"),
+                      url = "https://opendata.nationalrail.co.uk/api/staticfeeds/2.0/routeing"){
+
+
+
+  token = nrdp_authenticate(username, password)
+
+  response <- httr::GET(
+    url =  url,
+    httr::add_headers(`X-Auth-Token` = token$token)
+  )
+
+  # Check if the request was successful
+  if (httr::status_code(response) == 200) {
+    # Write the content of the response to a file
+    writeBin(httr:::content(response, "raw"), destfile)
+    cat("File downloaded successfully to", destfile)
+  } else {
+    cat("Failed to download the file. Status code:", status_code(response))
+  }
+
+
+}
+
