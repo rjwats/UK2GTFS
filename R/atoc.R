@@ -133,7 +133,7 @@ atoc2gtfs <- function(path_in,
       # Combine
       stops_missing <- stops_file[!stops_file$stop_id %in% stops_sf$stop_id,]
       if(nrow(stops_missing) > 0){
-        warning("Adding ",nrow(stops_missing)," missing tiplocs, these may have unreliable location data")
+        message("Adding ",nrow(stops_missing)," missing tiplocs, these may have unreliable location data")
         stops <- rbind(stops_sf, stops_missing)
       } else {
         stops <- stops_sf

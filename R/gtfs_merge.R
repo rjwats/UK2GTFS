@@ -23,6 +23,10 @@ gtfs_merge <- function(gtfs_list, force = FALSE, quiet = TRUE, condenseServicePa
   #The Atoc code has moved from data.frame to data.table for performance reasons, but the transXchange code hasn't migrated yet.
   #this is a breaking change for some items because the behaviour for data.table isn't the same as data.frame, despite extending data.frame. nice.
   #least painful way to fix this for now is to convert to data.table if supplied data.frame
+
+  dt_mode = inherits(flattened[[1]], "data.table" ) # This new method
+
+
   flattened <- lapply( flattened, function(item)
     {
       if ( inherits(item, "data.table" ) ) return (item)
@@ -51,7 +55,15 @@ gtfs_merge <- function(gtfs_list, force = FALSE, quiet = TRUE, condenseServicePa
 
     #add a column to the data frame containing this unique number
     # suppressWarnings(matched <- dplyr::bind_rows(matched, .id = "file_id"))
-    matched$file_id <- as.integer(matched$file_id)
+    #
+
+    # Needed for old data.frames
+    if(dt_mode){
+      matched$file_id <- as.integer(matched$file_id)
+    } else {
+      matched <- data.table::rbindlist(matched, fill = TRUE, idcol = "file_id")
+    }
+
 
     #if("calendar_dates"==tableName)
     #{
@@ -238,14 +250,14 @@ gtfs_merge <- function(gtfs_list, force = FALSE, quiet = TRUE, condenseServicePa
     retainedColumnNames <- colnames(stop_times)[!(colnames(stop_times) %in% c("trip_id", "file_id"))]
     stop_times <- dplyr::left_join(stop_times, new_trip_id, by = c("file_id", "trip_id"))
     stop_times <- stop_times[, c("trip_id_new", retainedColumnNames), with=FALSE]
-    stop_times <- stop_times %>% dplyr::rename(trip_id = trip_id_new)
+    stop_times <- dplyr::rename(stop_times, trip_id = trip_id_new)
 
     if ( length(frequencies) > 0 )
     {
       retainedColumnNames <- colnames(frequencies)[!(colnames(frequencies) %in% c("trip_id", "file_id"))]
       frequencies <- dplyr::left_join(frequencies, new_trip_id, by = c("file_id", "trip_id"))
       frequencies <- frequencies[, c("trip_id_new", retainedColumnNames), with=FALSE]
-      frequencies <- frequencies %>% dplyr::rename(trip_id = trip_id_new)
+      frequencies <- dplyr::rename(frequencies, trip_id = trip_id_new)
     }
   }
 
@@ -253,14 +265,14 @@ gtfs_merge <- function(gtfs_list, force = FALSE, quiet = TRUE, condenseServicePa
     retainedColumnNames <- colnames(trips)[!(colnames(trips) %in% c("service_id"))]
     trips <- dplyr::left_join(trips, new_service_id, by = c("file_id", "service_id"))
     trips <- trips[, c(retainedColumnNames, "service_id_new"), with=FALSE]
-    trips <- trips %>% dplyr::rename(service_id = service_id_new)
+    trips <- dplyr::rename(trips, service_id = service_id_new)
   }
 
   if (exists("new_route_id")) {
     retainedColumnNames <- colnames(trips)[!(colnames(trips) %in% c("route_id"))]
     trips <- dplyr::left_join(trips, new_route_id, by = c("file_id", "route_id"))
     trips <- trips[, c("route_id_new", retainedColumnNames), with=FALSE]
-    trips <- trips %>% dplyr::rename(route_id = route_id_new)
+    trips <- dplyr::rename(trips, route_id = route_id_new)
   }
 
   trips$file_id <- NULL

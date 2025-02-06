@@ -217,7 +217,7 @@ makeCalendar <- function(schedule, ncores = 1) {
     calendar <- schedule[, c("Train UID", "Date Runs From", "Date Runs To", "Days Run", "STP indicator", "rowID" )]
     names(calendar) <- c("UID", "start_date", "end_date", "Days", "STP", "rowID" )
 
-    if( treatDatesAsInt )
+    if(FALSE) #treatDatesAsInt ) # Disabling as causing failures
     {
       setupDatesCache( calendar )
       #treating date as int: seem to be about twice as fast on the critical line when selecting base timetable
@@ -430,7 +430,7 @@ afterMidnight <- function(stop_times, safe = TRUE) {
 
   numb2time2 <- function(dt, colNameDest, colNameSource){
     #performance, substr is relatively expensive
-    set(dt, j=colNameDest, value= sprintf("%02d:%02d:%02d",
+    data.table::set(dt, j=colNameDest, value= sprintf("%02d:%02d:%02d",
               dt[[colNameSource]] %/% 10000, (dt[[colNameSource]] %/% 100) %% 100, dt[[colNameSource]] %% 100) )
   }
 
@@ -458,6 +458,8 @@ clean_activities2 <- function(x, public_only = TRUE) {
 
   if (public_only)
   {
+    data(activity_codes)
+
     x <- dplyr::left_join(x, activity_codes, by = c("activity"))
     if (anyNA(x$pickup_type)) {
       mss <- unique(x$activity[is.na(x$pickup_type)])

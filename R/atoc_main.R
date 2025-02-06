@@ -117,7 +117,7 @@ schedule2routes <- function(stop_times, stops, schedule, silent = TRUE, ncores =
   }
 
   #do the conversion to route_type before grouping because several statuses map to the same route_type and we get 'duplicate' routes that look the same.
-  train_status <- data.table(
+  train_status <- data.table::data.table(
     train_status = c("B", "F", "P", "S", "T", "1", "2", "3", "4", "5"),
     route_type = c(   3,   NA,  2,   4,   NA,  2,   NA,  NA,  4,   3),
     stringsAsFactors = FALSE

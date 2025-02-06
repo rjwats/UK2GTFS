@@ -113,7 +113,7 @@ duplicate_related_items <- function(calendar, related_items, original_join_field
   {
     #no duplicating to do
     warning("duplicate_related_items: there were no duplicates detected. In real data this may indicate there has been an error earlier in the processing.")
-    related_items_dup = data.table()
+    related_items_dup = data.table::data.table()
   }
   else
   {
@@ -204,7 +204,7 @@ strip_whitespace <- function(dt) {
   char_col_names <- names(char_cols[char_cols])
 
   for (col_name in char_col_names) {
-    set(dt, j = col_name, value = trimws(dt[[col_name]], which = "right"))
+    data.table::set(dt, j = col_name, value = trimws(dt[[col_name]], which = "right"))
     dt[dt[[col_name]] == "", (col_name) := NA_character_]
   }
 
@@ -234,7 +234,7 @@ processOneTime <- function(dt, working_timetable, targetField, sourceFieldWtt, s
     {
       if(hasPass)
       {
-        set(dt, j = targetField, value = gsub("^(\\d{4}) $","\\100",gsub("^(\\d{4})H$", "\\130",
+        data.table::set(dt, j = targetField, value = gsub("^(\\d{4}) $","\\100",gsub("^(\\d{4})H$", "\\130",
                                                                          data.table::fifelse( "     "==dt[[sourceFieldWtt]],
                                                                                               dt[["Scheduled Pass"]],
                                                                                               dt[[sourceFieldWtt]])))
@@ -242,14 +242,14 @@ processOneTime <- function(dt, working_timetable, targetField, sourceFieldWtt, s
       }
       else
       {
-        set(dt, j = targetField, value = gsub("^(\\d{4}) $","\\100",gsub("^(\\d{4})H$", "\\130", dt[[sourceFieldWtt]])))
+        data.table::set(dt, j = targetField, value = gsub("^(\\d{4}) $","\\100",gsub("^(\\d{4})H$", "\\130", dt[[sourceFieldWtt]])))
       }
     }
     else
     {
       if(hasPass)
       {
-        set(dt, j = targetField, value = data.table::fifelse( "0000"==dt[[sourceField]],
+        data.table::set(dt, j = targetField, value = data.table::fifelse( "0000"==dt[[sourceField]],
                                                               gsub("^(\\d{4}) $","\\100",gsub("^(\\d{4})H$", "\\130",
                                                                                               data.table::fifelse( "     "==dt[[sourceFieldWtt]],
                                                                                                                    dt[["Scheduled Pass"]],
@@ -260,7 +260,7 @@ processOneTime <- function(dt, working_timetable, targetField, sourceFieldWtt, s
       else
       {
         #If there is no Public Arrival time this field will default to 0000. (we will use WTT instead)
-        set(dt, j = targetField, value = data.table::fifelse( "0000"==dt[[sourceField]],
+        data.table::set(dt, j = targetField, value = data.table::fifelse( "0000"==dt[[sourceField]],
                                                               gsub("^(\\d{4}) $","\\100",gsub("^(\\d{4})H$", "\\130", dt[[sourceFieldWtt]])),
                                                               gsub("^(\\d{4})$", "\\100", dt[[sourceField]]))
         )
@@ -313,7 +313,7 @@ process_activity <- function(dt, public_only) {
 
   #replace multiple comma with single comma, remove whitespace, remove leading comma, remove trailing comma.
   activity = gsub(",+", ",", activity)
-  set(dt, j="Activity", value = gsub("\\s+|^,|,$", "", activity))
+  data.table::set(dt, j="Activity", value = gsub("\\s+|^,|,$", "", activity))
 
   #remove rows with no activity we're interested in (there is no activity at 'pass' locations)
   if(public_only)
@@ -372,7 +372,7 @@ getCachedLocationData <- function(locations = "tiplocs")
   {
     stops <- cbind(locations, sf::st_coordinates(locations))
     stops <- sf::st_drop_geometry(stops)
-    stops <- as.data.table(stops)
+    stops <- data.table::as.data.table(stops)
     data.table::setnames(stops, old = c("Y", "X"), new = c("stop_lat", "stop_lon"))
   }
   else #TODO test column names

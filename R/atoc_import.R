@@ -142,7 +142,7 @@ importMSN <- function(file, silent = TRUE) {
     col_types = rep("character", 17 - 1),
     widths = c(1, 4, 26 + 4, 1, 7, 3, 3, 3, 5, 1, 5, 2, 1, 1, 11, 3)
   )
-  setDT(station)
+  data.table::setDT(station)
   names(station) <- c(
     "Record Type", "Reserved1", "Station Name",
     "CATE Interchange status", "TIPLOC Code", "CRS Reference Code",
@@ -196,7 +196,7 @@ importMSN <- function(file, silent = TRUE) {
     col_types = rep("character", 5 - 1),
     widths = c(1, 4, 26 + 4, 45)
   )
-  setDT(timetable)
+  data.table::setDT(timetable)
   names(timetable) <- c(
     "Record Type", "Reserved1", "Station Name",
     "GBTT numbers"
@@ -219,7 +219,7 @@ importMSN <- function(file, silent = TRUE) {
     col_types = rep("character", 2),
     widths = c(1, 79)
   )
-  setDT(comment)
+  data.table::setDT(comment)
   names(comment) <- c("Record Type", "Comment")
 
   comment$`Record Type` <- NULL
@@ -235,7 +235,7 @@ importMSN <- function(file, silent = TRUE) {
     col_types = rep("character", 6 - 1),
     widths = c(1, 4, 26 + 5, 26, 20)
   )
-  setDT(alias)
+  data.table::setDT(alias)
   names(alias) <- c(
     "Record Type", "Reserved1", "Station Name",
     "Station Alias", "Reserved3"
@@ -322,7 +322,7 @@ importMCA <- function(file,
       6, 1, 1, 1, 1, 4, 4, 1, 1
     )
   )
-  setDT(BS)
+  data.table::setDT(BS)
   names(BS) <- c(
     "Record Identity", "Transaction Type", "Train UID", "Date Runs From",
     "Date Runs To", "Days Run", "Bank Holiday Running", "Train Status",
@@ -540,7 +540,7 @@ importMCA <- function(file,
       col_types = rep("character", 3),
       widths = c(2, 7, 71)
     )
-    setDT(TD)
+    data.table::setDT(TD)
     names(TD) <- c("Record Identity", "TIPLOC code", "Spare")
     TD$Spare <- NULL
     TD$`Record Identity` <- NULL
@@ -562,7 +562,7 @@ importMCA <- function(file,
       col_types = rep("character", 16),
       widths = c(2, 1, 6, 6, 6, 6, 7, 2, 1, 7, 1, 1, 1, 1, 31, 1)
     )
-    setDT(AA)
+    data.table::setDT(AA)
     names(AA) <- c(
       "Record Identity", "Transaction Type", "Base UID", "Assoc UID",
       "Assoc Start date", "Assoc End date", "Assoc Days", "Assoc Cat",

@@ -216,7 +216,7 @@ as_data_table_naptan_stop_point <- function( doc, stopTypes = c("RLY") )
   }
 
 
-  dt <- data.table(
+  dt <- data.table::data.table(
     AtcoCode = xml2::xml_text(xml2::xml_find_first( SPnodes, "./npt:AtcoCode/text()", ns = ns )),
     NaptanCode = xml2::xml_text(xml2::xml_find_first( SPnodes, "./npt:NaptanCode/text()", ns = ns )),
     #railway stations don't generally have naptan code (very small number of entrances do)
@@ -270,7 +270,7 @@ as_data_table_naptan_stop_area <- function( doc )
   #the other interesting thing in the naptan doc are 'Stop Area'
   SAnodes = xml2::xml_find_all( doc, "/*/*/npt:StopArea", ns=ns )
 
-  dt <- data.table(
+  dt <- data.table::data.table(
     StopAreaCode = xml2::xml_text(xml2::xml_find_first( SAnodes, "./npt:StopAreaCode/text()", ns = ns )),
     Name = xml2::xml_text(xml2::xml_find_first( SAnodes, "./npt:Name/text()", ns = ns )),
     AdministrativeAreaRef = xml2::xml_integer(xml2::xml_find_first( SAnodes, "./npt:AdministrativeAreaRef/text()", ns = ns )),

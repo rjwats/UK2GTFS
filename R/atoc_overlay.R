@@ -61,19 +61,19 @@ set_WDAY_LOOKUP_MAP <- function( value )
 
 local_lubridate_wday <- function( date, label = FALSE, week_start=1L )
 {
-  if (TRUE==TREAT_DATES_AS_INT)
-  {
-    if( any(date<=WDAY_LOOKUP_MIN_VALUE) || any(date>WDAY_LOOKUP_MAX_VALUE) )
-    {
-      stop("requested value index [", date, "] is outside lookup table")
-    }
-
-    return ( WDAY_LOOKUP_MAP[ date-WDAY_LOOKUP_MIN_VALUE ] )
-  }
-  else
-  {
+  # if (TRUE==TREAT_DATES_AS_INT)
+  # {
+  #   if( any(date<=WDAY_LOOKUP_MIN_VALUE) || any(date>WDAY_LOOKUP_MAX_VALUE) )
+  #   {
+  #     stop("requested value index [", date, "] is outside lookup table")
+  #   }
+  #
+  #   return ( WDAY_LOOKUP_MAP[ date-WDAY_LOOKUP_MIN_VALUE ] )
+  # }
+  # else
+  # {
     return ( lubridate::wday( date, label = FALSE, week_start=1L ) )
-  }
+  # }
 }
 
 
@@ -197,7 +197,7 @@ splitAndRebindBitmask <- function( calendar )
   calMat = splitBitmaskMat( calendar$Days, asInteger=FALSE )
 
   #this function gets expensive if you call it a lot, creating data.table takes a while
-  return (cbind( calendar, as.data.table(calMat) ) )
+  return (cbind( calendar, data.table::as.data.table(calMat) ) )
 }
 
 splitBitmaskMat <- function( bitmaskVector, asInteger=FALSE )
@@ -549,7 +549,7 @@ selectOverlayTimeableAndCopyAttributes <- function(cal, calNew, rowIndex)
   #this speeds things up when we look up the required priority overlay **SEE_NOTE**
   #so we don't need to sort again here, just pick the top filtered result
 
-  set( calNew, i = rowIndex, j = CALENDAR_COLS_TO_COPY, value = cal[ baseTimetableIndexes[1L], CALENDAR_COLS_TO_COPY, with=FALSE ] )
+  data.table::set( calNew, i = rowIndex, j = CALENDAR_COLS_TO_COPY, value = cal[ baseTimetableIndexes[1L], CALENDAR_COLS_TO_COPY, with=FALSE ] )
   #set() runs 3x faster than this style of copy      calNew[rowIndex,] <- cal[baseTimetableIndexes[1],]
 
   return (calNew)
@@ -625,7 +625,7 @@ splitDates <- function(cal) {
   dates <- dates[order(dates)]
 
   # create all unique pairs so we know how to chop the dates up into non-overlapping periods
-  dates.dt <- unique( data.table(
+  dates.dt <- unique( data.table::data.table(
     start_date = dates[seq(1L, length(dates) - 1L)],
     end_date = dates[seq(2L, length(dates))]
   ) )
@@ -781,8 +781,8 @@ makeCalendarInner <- function(calendarSub) {
         #performance pre-sort all the entries by the priority
         #this speeds things up when we look up the required priority overlay **SEE_NOTE**
         #calendarSub = calendarSub[ order(STP, duration), ]
-        setkey( calendarSub, STP, duration )
-        setindex( calendarSub, start_date, end_date)
+        data.table::setkey( calendarSub, STP, duration )
+        data.table::setindex( calendarSub, start_date, end_date)
 
         calendar_new <- makeCalendarsUnique( splitDates(calendarSub) )
         res = list(calendar_new, NA)
@@ -860,8 +860,8 @@ makeCalendarForDifferentDayPatterns <- function( calendar, uniqueDayPatterns )
       #performance pre-sort all the entries by the priority
       #this speeds things up when we look up the required priority overlay **SEE_NOTE**
       #timetablesForThisPattern = timetablesForThisPattern[ order(STP, duration), ]
-      setkey( timetablesForThisPattern, STP, duration )
-      setindex( timetablesForThisPattern, start_date, end_date)
+      data.table::setkey( timetablesForThisPattern, STP, duration )
+      data.table::setindex( timetablesForThisPattern, start_date, end_date)
 
       thisSplit <- splitDates( timetablesForThisPattern )
 

@@ -19,12 +19,16 @@ gtfs_read <- function(path){
 
   if(checkmate::test_file_exists(file.path(tmp_folder,"agency.txt"))){
 
-    gtfs$agency <- fread(
+    # Read the first few rows of the file to check for column names
+    sample_data <- fread(file.path(tmp_folder, "agency.txt"), nrows = 1, header = TRUE)
+    col_classes <- c(agency_id = "character")
+    if ("agency_noc" %in% colnames(sample_data)) {
+      col_classes <- c(col_classes, agency_noc = "character")
+    }
+
+    gtfs$agency <- data.table::fread(
       file.path(tmp_folder, "agency.txt"),
-      colClasses = c(
-        agency_id = "character",
-        agency_noc = "character"
-      ),
+      colClasses = col_classes,
       showProgress = FALSE,
       sep=',',
       header=TRUE,
@@ -37,19 +41,30 @@ gtfs_read <- function(path){
 
   if(checkmate::test_file_exists(file.path(tmp_folder,"stops.txt"))){
 
-    gtfs$stops <- fread(
+    # Read the first few rows of the file to check for column names
+    sample_data <- fread(file.path(tmp_folder, "stops.txt"), nrows = 1, header = TRUE)
+    col_classes <- c(stop_id = "character",
+                     stop_code = "character",
+                     stop_name = "character",
+                     stop_lat = "numeric",
+                     stop_lon = "numeric")
+    if ("wheelchair_boarding" %in% colnames(sample_data)) {
+      col_classes <- c(col_classes, wheelchair_boarding = "integer")
+    }
+    if ("location_type" %in% colnames(sample_data)) {
+      col_classes <- c(col_classes, location_type = "integer")
+    }
+    if ("parent_station" %in% colnames(sample_data)) {
+      col_classes <- c(col_classes, parent_station = "character")
+    }
+    if ("platform_code" %in% colnames(sample_data)) {
+      col_classes <- c(col_classes, platform_code = "character")
+    }
+
+
+    gtfs$stops <- data.table::fread(
       file.path(tmp_folder, "stops.txt"),
-      colClasses = c(
-        stop_id = "character",
-        stop_code = "character",
-        stop_name = "character",
-        stop_lat = "numeric",
-        stop_lon = "numeric",
-        wheelchair_boarding = "integer", #enum value 2 is valid but rarely seen outside the spec document
-        location_type = "integer",
-        parent_station = "character",
-        platform_code = "character"
-      ),
+      colClasses = col_classes,
       showProgress = FALSE,
       sep=',',
       header=TRUE,
@@ -62,7 +77,7 @@ gtfs_read <- function(path){
 
   if(checkmate::test_file_exists(file.path(tmp_folder,"routes.txt"))){
 
-    gtfs$routes <- fread(
+    gtfs$routes <- data.table::fread(
       file.path(tmp_folder, "routes.txt"),
       colClasses = c(
         route_id = "character",
@@ -83,16 +98,25 @@ gtfs_read <- function(path){
 
   if(checkmate::test_file_exists(file.path(tmp_folder,"trips.txt"))){
 
-    gtfs$trips <- fread(
+    # Read the first few rows of the file to check for column names
+    sample_data <- fread(file.path(tmp_folder, "trips.txt"), nrows = 1, header = TRUE)
+    col_classes <- c( trip_id = "character",
+                      route_id = "character",
+                      service_id = "character")
+    if ("block_id" %in% colnames(sample_data)) {
+      col_classes <- c(col_classes, block_id = "character")
+    }
+    if ("shape_id" %in% colnames(sample_data)) {
+      col_classes <- c(col_classes, shape_id = "character")
+    }
+    if ("wheelchair_accessible" %in% colnames(sample_data)) {
+      col_classes <- c(col_classes, wheelchair_accessible = "integer")
+    }
+
+
+    gtfs$trips <- data.table::fread(
       file.path(tmp_folder, "trips.txt"),
-      colClasses = c(
-        trip_id = "character",
-        route_id = "character",
-        service_id = "character",
-        block_id = "character",
-        shape_id = "character",
-        wheelchair_accessible = "integer" #enum value 2 is valid but rarely seen outside the spec document
-      ),
+      colClasses = col_classes,
       showProgress = FALSE,
       sep=',',
       header=TRUE,
@@ -105,19 +129,29 @@ gtfs_read <- function(path){
 
   if(checkmate::test_file_exists(file.path(tmp_folder,"stop_times.txt"))){
 
-    gtfs$stop_times <- fread(
+    # Read the first few rows of the file to check for column names
+    sample_data <- fread(file.path(tmp_folder, "stop_times.txt"), nrows = 1, header = TRUE)
+    col_classes <- c( trip_id = "character",
+                      stop_id = "character",
+                      stop_sequence = "integer",
+                      departure_time = "character",
+                      arrival_time = "character")
+    if ("shape_dist_traveled" %in% colnames(sample_data)) {
+      col_classes <- c(col_classes, shape_dist_traveled = "numeric")
+    }
+    if ("timepoint" %in% colnames(sample_data)) {
+      col_classes <- c(col_classes, timepoint = "integer")
+    }
+    if ("pickup_type" %in% colnames(sample_data)) {
+      col_classes <- c(col_classes, pickup_type = "integer")
+    }
+    if ("drop_off_type" %in% colnames(sample_data)) {
+      col_classes <- c(col_classes, drop_off_type = "integer")
+    }
+
+    gtfs$stop_times <- data.table::fread(
       file.path(tmp_folder, "stop_times.txt"),
-      colClasses = c(
-        trip_id = "character",
-        stop_id = "character",
-        stop_sequence = "integer",
-        departure_time = "character",
-        arrival_time = "character",
-        shape_dist_traveled = "numeric",
-        timepoint = "integer",
-        pickup_type = "integer",
-        drop_off_type = "integer"
-      ),
+      colClasses = col_classes,
       showProgress = FALSE,
       sep=',',
       header=TRUE,
@@ -133,7 +167,7 @@ gtfs_read <- function(path){
 
   if(checkmate::test_file_exists(file.path(tmp_folder,"calendar.txt"))){
 
-    gtfs$calendar <- fread(
+    gtfs$calendar <- data.table::fread(
       file.path(tmp_folder, "calendar.txt"),
       colClasses = c(
         service_id = "character",
@@ -162,7 +196,7 @@ gtfs_read <- function(path){
 
   if(checkmate::test_file_exists(file.path(tmp_folder,"calendar_dates.txt"))){
 
-    gtfs$calendar_dates <- fread(
+    gtfs$calendar_dates <- data.table::fread(
       file.path(tmp_folder, "calendar_dates.txt"),
       colClasses = c(
         service_id = "character",
@@ -206,7 +240,7 @@ gtfs_read <- function(path){
 
   for (fileName in notLoadedFiles)
   {
-    table <- fread(
+    table <- data.table::fread(
       file.path(tmp_folder, paste0(fileName, ".txt")),
       showProgress = FALSE,
       sep=',',
