@@ -195,18 +195,29 @@ fixStopTimeData <- function(stop_times)
 #' empty values are converted to NA
 #'     returns the data.table
 #'
-#' @param dt data table
+#' @param dt data table or data frame (for legacy mode)
 #' @noRd
 #'
 strip_whitespace <- function(dt) {
 
-  char_cols <- sapply(dt, is.character)
-  char_col_names <- names(char_cols[char_cols])
+  if(inherits(dt,"data.table")){
+    char_cols <- sapply(dt, is.character)
+    char_col_names <- names(char_cols[char_cols])
 
-  for (col_name in char_col_names) {
-    data.table::set(dt, j = col_name, value = trimws(dt[[col_name]], which = "right"))
-    dt[dt[[col_name]] == "", (col_name) := NA_character_]
+    for (col_name in char_col_names) {
+      data.table::set(dt, j = col_name, value = trimws(dt[[col_name]], which = "right"))
+      dt[dt[[col_name]] == "", (col_name) := NA_character_]
+    }
+  } else {
+    sws <- function(val) {
+      val <- trimws(val, which = "right")
+      val[val == ""] <- NA
+      return(val)
+    }
+    dt[] <- lapply(dt, sws)
   }
+
+
 
   return (dt)
 }

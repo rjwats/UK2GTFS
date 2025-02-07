@@ -14,9 +14,7 @@ knitr::opts_chunk$set(
 ```
 # UK2GTFS <a href='https://itsleeds.github.io/'><img src='man/figures/logo.png' align="right" height=215/></a>
 
-
-
-
+[![Coverage Status](https://img.shields.io/codecov/c/github/itsleeds/UK2GTFS/master.svg)](https://codecov.io/gh/itsleeds/UK2GTFS)
 
 UK2GTFS is an R package to convert and work with train, tram, bus, ferry, and metro timetable data from the unfriendly and difficult to use formats used in the UK to the easy to use [GTFS](https://developers.google.com/transit/gtfs/) format. The main purpose of developing the package is to support using [OpenTripPlanner](https://github.com/ropensci/opentripplanner) in the UK.
 

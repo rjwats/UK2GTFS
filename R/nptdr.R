@@ -171,7 +171,13 @@ nptdr2gtfs <- function(path = "D:/OneDrive - University of Leeds/Data/UK2GTFS/NP
 
     if(length(stops_missing) > 0){
       naptan <- naptan[naptan$stop_id %in% stops_missing,]
-      naptan <- naptan[,names(stops)]
+
+      if(inherits(naptan, "data.table")){
+        naptan = naptan[, names(stops), with = FALSE]
+      } else {
+        naptan <- naptan[,names(stops)]
+      }
+
       if(nrow(naptan) > 0){
         stops <- rbind(stops, naptan)
       }
