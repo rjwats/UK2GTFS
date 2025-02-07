@@ -725,7 +725,7 @@ test_that("test duplicateItems:1", {
 
   testData$`_reps` = repetitions
 
-  res = duplicateItems( testData, "UID", ncores=4 )
+  res = duplicateItems( testData, "UID", ncores=2 )
 
   summary <- as.data.frame( res %>%
                               dplyr::group_by(UID) %>%
