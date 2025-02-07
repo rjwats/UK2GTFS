@@ -230,7 +230,7 @@ transxchange2gtfs <- function(path_in,
 
   if(!silent){ message(paste0(Sys.time(), " Merging GTFS objects"))}
 
-  gtfs_merged <- try(gtfs_merge(gtfs_all, force = force_merge))
+  gtfs_merged <- try(gtfs_merge(gtfs_all, force = force_merge, quiet = !silent))
 
   if (inherits(gtfs_merged, "try-error")) {
     message("Merging failed, returing unmerged GFTS object for analysis")
