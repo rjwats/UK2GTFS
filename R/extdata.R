@@ -22,10 +22,10 @@ update_data <- function( timeout=60 ){
       response <- readline("UK2GTFS data is out of date. Do you want to update? (yes/no): ")
       response <- tolower(response)
 
-      if (response == "yes" || response == "y") {
-        message("Updating internal package data")
+      if (response %in% c("yes","y","YES","Y")) {
+        packageStartupMessage("Updating internal package data")
         download_data(check$tag_name, check$package_location, check$date)
-      } else if (response == "no" || response == "n") {
+      } else if (response %in% c("no","n","NO","N")) {
         cat("You can rerun this check with update_data()")
       } else {
         cat("Invalid response.\n")
@@ -33,13 +33,12 @@ update_data <- function( timeout=60 ){
 
 
     } else {
-      message("Data not updated, run update_data()")
-      message("Updating internal package data")
+      packageStartupMessage ("Updating internal package data")
       download_data(check$tag_name, check$package_location, check$date)
     }
 
   } else {
-    message("Your UK2GTFS data is up to date")
+    packageStartupMessage("Your UK2GTFS data is up to date")
   }
 
 }
