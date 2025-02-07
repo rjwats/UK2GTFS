@@ -14,6 +14,8 @@ context("Test the main atoc function")
 
 test_that("test atoc2gtfs singlecore", {
   gtfs <- atoc2gtfs(path_in = file.path(data_path,"atoc.zip"),
+                    silent = FALSE,
+
             ncores = 1)
 
   expect_true(class(gtfs) == "list")

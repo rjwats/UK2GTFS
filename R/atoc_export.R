@@ -208,10 +208,10 @@ longnames <- function(routes, stop_times, stops) {
 #'
 makeCalendar <- function(schedule, ncores = 1) {
 
-  treatDatesAsInt = getOption("UK2GTFS_opt_treatDatesAsInt", default=TRUE)
-  set_TREAT_DATES_AS_INT( treatDatesAsInt )
+  #treatDatesAsInt = getOption("UK2GTFS_opt_treatDatesAsInt", default=TRUE)
+  #set_TREAT_DATES_AS_INT( treatDatesAsInt )
 
-  tryCatch({
+  #tryCatch({
 
     # prep the inputs
     calendar <- schedule[, c("Train UID", "Date Runs From", "Date Runs To", "Days Run", "STP indicator", "rowID" )]
@@ -291,11 +291,6 @@ makeCalendar <- function(schedule, ncores = 1) {
 
     } else {
       res <- purrr::map(calendar_split, .f = makeCalendarInner)
-
-      # res <- pbapply::pblapply(
-      #   calendar_split,
-      #   makeCalendarInner
-      # )
     }
 
 
@@ -330,16 +325,17 @@ makeCalendar <- function(schedule, ncores = 1) {
                     "Please capture the data and raise a bug / create a test case. ", dups))
     }
 
-  }, finally = {
-    set_TREAT_DATES_AS_INT( FALSE )
+
+    #}, finally = {
+    #set_TREAT_DATES_AS_INT( FALSE )
 
     #revert treating date as int
-    if( TRUE==treatDatesAsInt )
-    {
-      if (exists("res.calendar")){ res.calendar = makeDateFieldsDateType( res.calendar ) }
-      if (exists("cancellations")){ cancellations = makeDateFieldsDateType( cancellations ) }
-    }
-  })
+  #   if( TRUE==treatDatesAsInt )
+  #   {
+  #     if (exists("res.calendar")){ res.calendar = makeDateFieldsDateType( res.calendar ) }
+  #     if (exists("cancellations")){ cancellations = makeDateFieldsDateType( cancellations ) }
+  #   }
+  # })
 
   return(list(res.calendar, cancellations))
 }
