@@ -24,3 +24,11 @@
 "school_terms"
 
 
+#' Historic Bank Holidays
+#'
+#' Bank holidays from 2001 to 2018 in the UK. Note Wales has the same holidays
+#' as England.
+#'
+#'
+#' @format A data frame with 4 columns
+"historic_bank_holidays"
