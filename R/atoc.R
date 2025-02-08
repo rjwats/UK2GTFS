@@ -68,6 +68,8 @@ atoc2gtfs <- function(path_in,
   if ( !inherits(locations, "character") || "file"!=locations )
   {
     stops_sf = getCachedLocationData( locations )
+    stops_sf = sf::st_drop_geometry(stops_sf)
+    stops_sf$geometry = NULL
   }
 
   # Is input a zip or a folder
