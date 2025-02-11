@@ -207,6 +207,9 @@ gtfs_trim_dates <- function(gtfs,
 #' @param zone_id Which column in `zone` is the ID column
 #' @param by_mode logical, disaggregate by mode?
 #' @param ncores numeric, how many cores to use in parallel processing
+#' @param time_bands list with two named vectors breaks and labels. Used to
+#'   define the time breakdown. Length of breaks must be one greater than length
+#'   of labels.
 #'
 #' @export
 gtfs_trips_per_zone <- function(gtfs,
@@ -215,7 +218,9 @@ gtfs_trips_per_zone <- function(gtfs,
                                 enddate = min(gtfs$calendar$start_date) + 31,
                                 zone_id = 1,
                                 by_mode = TRUE,
-                                ncores = 1){
+                                ncores = 1,
+                                time_bands = list(breaks = c(-1, 6, 10, 15, 18, 22, Inf),
+                                                  labels = c("Night", "Morning Peak", "Midday","Afternoon Peak","Evening","Night"))){
 
   if(!sf::st_is_longlat(zone)){
     message("Transforming zones to 4326")
@@ -319,8 +324,8 @@ gtfs_trips_per_zone <- function(gtfs,
   # +35 for any service in GTFS that runs past midnight (note that some may arrive following morning but a counted as evening)
   message("Stops that run past midnight are recorded in Night regardless of the time")
   stop_times$time_bands <- cut(lubridate::hour(stop_times$departure_time),
-                               breaks = c(-1, 6, 10, 15, 18, 22, Inf),
-                               labels = c("Night", "Morning Peak", "Midday","Afternoon Peak","Evening","Night"))
+                               breaks = time_bands$breaks,
+                               labels = time_bands$labels)
   gc()
   if(by_mode){
     stop_times <- stop_times[,c(c("trip_id","route_id","stop_id","time_bands","route_type",

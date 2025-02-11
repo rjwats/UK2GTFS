@@ -11,7 +11,9 @@ gtfs_trips_per_zone(
   enddate = min(gtfs$calendar$start_date) + 31,
   zone_id = 1,
   by_mode = TRUE,
-  ncores = 1
+  ncores = 1,
+  time_bands = list(breaks = c(-1, 6, 10, 15, 18, 22, Inf), labels = c("Night",
+    "Morning Peak", "Midday", "Afternoon Peak", "Evening", "Night"))
 )
 }
 \arguments{
@@ -28,6 +30,10 @@ gtfs_trips_per_zone(
 \item{by_mode}{logical, disaggregate by mode?}
 
 \item{ncores}{numeric, how many cores to use in parallel processing}
+
+\item{time_bands}{list with two named vectors breaks and labels. Used to
+define the time breakdown. Length of breaks must be one greater than length
+of labels.}
 }
 \description{
 Trim a GTFS file between two dates
