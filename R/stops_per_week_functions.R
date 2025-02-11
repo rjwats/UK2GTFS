@@ -66,6 +66,12 @@ gtfs_stop_frequency <- function(gtfs,
   calendar <- gtfs$calendar
   calendar_days <- gtfs$calendar_dates
 
+  # New gtfs_read loads in data.table IDate format
+  if(inherits(calendar$start_date,"IDate")){
+    startdate <- data.table::as.IDate(startdate)
+    enddate <- data.table::as.IDate(enddate)
+  }
+
   calendar <- calendar[calendar$start_date <= enddate,]
   calendar <- calendar[calendar$end_date >= startdate,]
 
@@ -148,6 +154,13 @@ gtfs_trim_dates <- function(gtfs,
   trips <- gtfs$trips
   calendar <- gtfs$calendar
   calendar_dates <- gtfs$calendar_dates
+
+  # New gtfs_read loads in data.table IDate format
+  if(inherits(calendar$start_date,"IDate")){
+    startdate <- data.table::as.IDate(startdate)
+    enddate <- data.table::as.IDate(enddate)
+  }
+
 
   calendar <- calendar[calendar$start_date <= enddate,]
   calendar <- calendar[calendar$end_date >= startdate,]
