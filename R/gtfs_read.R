@@ -148,6 +148,12 @@ gtfs_read <- function(path){
     if ("drop_off_type" %in% colnames(sample_data)) {
       col_classes <- c(col_classes, drop_off_type = "integer")
     }
+    if ("stop_headsign" %in% colnames(sample_data)) {
+      col_classes <- c(col_classes, stop_headsign = "character")
+    }
+    if ("stop_direction_name" %in% colnames(sample_data)) {
+      col_classes <- c(col_classes, stop_direction_name = "character")
+    }
 
     gtfs$stop_times <- data.table::fread(
       file.path(tmp_folder, "stop_times.txt"),
@@ -155,7 +161,7 @@ gtfs_read <- function(path){
       showProgress = FALSE,
       sep=',',
       header=TRUE,
-      data.table = TRUE
+      data.table = FALSE # Data table causes problems with lubridate
     )
 
     gtfs$stop_times$arrival_time <- lubridate::hms(gtfs$stop_times$arrival_time)
