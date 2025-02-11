@@ -7,6 +7,14 @@
 #'
 #' @noRd
 count_weekday_runs <- function(cal){
+
+  # Data.table fix Internal error: storage mode of IDate is somehow no longer integer
+  if(inherits(cal$start_date,"IDate")){
+    cal$start_date = as.Date(cal$start_date)
+    cal$end_date = as.Date(cal$end_date)
+  }
+
+
   cal$TMP_d <- as.integer(cal$end_date - cal$start_date) + 1
   cal$TMP_d[is.na(cal$TMP_d)] <- 0
 

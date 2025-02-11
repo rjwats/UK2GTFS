@@ -1,9 +1,13 @@
 
 context("Get the example atoc files")
 file_path <- file.path(tempdir(),"uk2gtfs_tests")
-dir.create(file_path)
 data_path <- file.path(tempdir(),"uk2gtfs_data")
-dir.create(data_path)
+if(!dir.exists(file_path)){
+  dir.create(file_path)
+}
+if(!dir.exists(data_path)){
+  dir.create(data_path)
+}
 
 test_that("test atoc data is there", {
   expect_true(dl_example_file(data_path, "atoc"))

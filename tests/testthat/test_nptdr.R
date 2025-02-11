@@ -1,16 +1,20 @@
 
-context("Get the example atoc files")
+context("Get the example nptdr files")
 file_path <- file.path(tempdir(),"uk2gtfs_tests")
-dir.create(file_path)
 data_path <- file.path(tempdir(),"uk2gtfs_data")
-dir.create(data_path)
+if(!dir.exists(file_path)){
+  dir.create(file_path)
+}
+if(!dir.exists(data_path)){
+  dir.create(data_path)
+}
 
-test_that("test atoc data is there", {
+test_that("test nptdr data is there", {
   expect_true(dl_example_file(data_path, "nptdr"))
   expect_true(file.exists(file.path(data_path, "nptdr.zip")))
 })
 
-context("Test the main atoc function")
+context("Test the main nptdr function")
 
 naptan = get_naptan()
 
