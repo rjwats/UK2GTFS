@@ -20,7 +20,7 @@ gtfs_read <- function(path){
   if(checkmate::test_file_exists(file.path(tmp_folder,"agency.txt"))){
 
     # Read the first few rows of the file to check for column names
-    sample_data <- fread(file.path(tmp_folder, "agency.txt"), nrows = 1, header = TRUE)
+    sample_data <- data.table::fread(file.path(tmp_folder, "agency.txt"), nrows = 1, header = TRUE)
     col_classes <- c(agency_id = "character")
     if ("agency_noc" %in% colnames(sample_data)) {
       col_classes <- c(col_classes, agency_noc = "character")
@@ -42,7 +42,7 @@ gtfs_read <- function(path){
   if(checkmate::test_file_exists(file.path(tmp_folder,"stops.txt"))){
 
     # Read the first few rows of the file to check for column names
-    sample_data <- fread(file.path(tmp_folder, "stops.txt"), nrows = 1, header = TRUE)
+    sample_data <- data.table::fread(file.path(tmp_folder, "stops.txt"), nrows = 1, header = TRUE)
     col_classes <- c(stop_id = "character",
                      stop_code = "character",
                      stop_name = "character",
@@ -99,7 +99,7 @@ gtfs_read <- function(path){
   if(checkmate::test_file_exists(file.path(tmp_folder,"trips.txt"))){
 
     # Read the first few rows of the file to check for column names
-    sample_data <- fread(file.path(tmp_folder, "trips.txt"), nrows = 1, header = TRUE)
+    sample_data <- data.table::fread(file.path(tmp_folder, "trips.txt"), nrows = 1, header = TRUE)
     col_classes <- c( trip_id = "character",
                       route_id = "character",
                       service_id = "character")
@@ -130,7 +130,7 @@ gtfs_read <- function(path){
   if(checkmate::test_file_exists(file.path(tmp_folder,"stop_times.txt"))){
 
     # Read the first few rows of the file to check for column names
-    sample_data <- fread(file.path(tmp_folder, "stop_times.txt"), nrows = 1, header = TRUE)
+    sample_data <- data.table::fread(file.path(tmp_folder, "stop_times.txt"), nrows = 1, header = TRUE)
     col_classes <- c( trip_id = "character",
                       stop_id = "character",
                       stop_sequence = "integer",
