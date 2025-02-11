@@ -157,6 +157,10 @@ gtfs_trim_dates <- function(gtfs,
                             startdate = lubridate::ymd("2020-03-01"),
                             enddate = lubridate::ymd("2020-04-30")) {
 
+  if(enddate < startdate){
+    stop("enddate is before start date")
+  }
+
   message("Trimming GTFS between ",startdate," and ",enddate)
   stop_times <- gtfs$stop_times
   trips <- gtfs$trips
@@ -166,7 +170,7 @@ gtfs_trim_dates <- function(gtfs,
   # New gtfs_read loads in data.table IDate format
   if(inherits(calendar$start_date,"IDate")){
     calendar$start_date <- as.Date(calendar$start_date)
-    calendar$end_date <- as.Date(calendar$start_date)
+    calendar$end_date <- as.Date(calendar$end_date)
   }
 
   if(inherits(calendar_dates$date,"IDate")){
