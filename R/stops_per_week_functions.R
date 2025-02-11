@@ -165,8 +165,12 @@ gtfs_trim_dates <- function(gtfs,
 
   # New gtfs_read loads in data.table IDate format
   if(inherits(calendar$start_date,"IDate")){
-    startdate <- data.table::as.IDate(startdate)
-    enddate <- data.table::as.IDate(enddate)
+    calendar$start_date <- as.Date(calendar$start_date)
+    calendar$end_date <- as.Date(calendar$start_date)
+  }
+
+  if(inherits(calendar_dates$date,"IDate")){
+    calendar_dates$date <- as.Date(calendar_dates$date)
   }
 
 
