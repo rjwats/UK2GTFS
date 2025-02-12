@@ -308,7 +308,10 @@ gtfs_trips_per_zone <- function(gtfs,
   trips <- dplyr::left_join(trips, calendar_dates_summary, by = "service_id")
   rm(calendar, calendar_dates_summary, calendar_dates_summary_missing)
 
-  trips[4:ncol(trips)] <- lapply(trips[4:ncol(trips)], function(x){
+  #TODO: Fix this as ncols may be different beween sources
+  trips = as.data.frame(trips)
+  nms_match = grep("(runs_)|(extra_)|(canceled_)",names(trips))
+  trips[nms_match] <- lapply(trips[nms_match], function(x){
     ifelse(is.na(x),0,x)
   })
 
@@ -355,9 +358,9 @@ gtfs_trips_per_zone <- function(gtfs,
 
   stop_times = stop_times[!is.na(stop_times$time_bands),]
 
-  stop_times <- dplyr::left_join(stop_times, stops_zids, by = "stop_id", relationship = "many-to-many")
+  stop_times <- dplyr::left_join(stop_times, sf::st_drop_geometry(stops_zids), by = "stop_id", relationship = "many-to-many")
   rm(stops_zids)
-  stop_times <- sf::st_drop_geometry(stop_times)
+  #stop_times <- sf::st_drop_geometry(stop_times)
   stop_times$geometry <- NULL
 
   # Count number of days in study period
