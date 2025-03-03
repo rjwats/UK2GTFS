@@ -379,6 +379,7 @@ gtfs_trips_per_zone <- function(gtfs,
                            .f = internal_trips_per_zone,
                            by_mode = by_mode,
                            days_tot = days_tot,
+                           time_bands = time_bands,
                            .progress = TRUE)
   future::plan(future::sequential)
 
@@ -393,7 +394,7 @@ gtfs_trips_per_zone <- function(gtfs,
 
 #' Internal helper function
 #' @noRd
-internal_trips_per_zone <- function(x, by_mode = TRUE, days_tot){
+internal_trips_per_zone <- function(x, by_mode = TRUE, days_tot, time_bands){
   x <- x[!duplicated(x$trip_id),]
   #zone_id = x$zone_id[1]
   #x <- x[,c("time_bands","runs_Mon","runs_Tue","runs_Wed","runs_Thu","runs_Fri","runs_Sat","runs_Sun")]
@@ -406,8 +407,16 @@ internal_trips_per_zone <- function(x, by_mode = TRUE, days_tot){
   x$tot_Sat = days_tot$Freq[days_tot$days_tot == "Sat"]
   x$tot_Sun = days_tot$Freq[days_tot$days_tot == "Sun"]
 
-  timebands <- data.frame(time_bands =  c("Night", "Morning Peak", "Midday","Afternoon Peak","Evening"),
-                          band_hours = c(8, 4, 5,3,4))
+  # timebands <- data.frame(time_bands =  c("Night", "Morning Peak", "Midday","Afternoon Peak","Evening"),
+  #                         band_hours = c(8, 4, 5,3,4))
+  timebands = data.frame(time_bands = time_bands$labels)
+  band_hours = time_bands$breaks
+  band_hours[band_hours < 0] = 0
+  band_hours[band_hours > 24] = 24
+  timebands$band_hours = diff(band_hours)
+  timebands = dplyr::group_by(timebands, time_bands)
+  timebands = dplyr::summarise(timebands, band_hours = sum(band_hours))
+
   x = dplyr::left_join(x, timebands, "time_bands")
 
 
@@ -457,3 +466,33 @@ internal_trips_per_zone <- function(x, by_mode = TRUE, days_tot){
 
   return(x)
 }
+
+
+
+
+calculate_time_band_durations <- function(time_bands) {
+  breaks <- time_bands$breaks
+  labels <- time_bands$labels
+
+  durations <- numeric(length(labels))
+
+  for (i in seq_along(labels)) {
+    if (labels[i] == "Night") {
+      if (i == 1) {
+        durations[i] <- breaks[i + 1] - breaks[i]
+      } else {
+        durations[i] <- 24 - (breaks[i - 1] %% 24) + (breaks[i] %% 24)
+      }
+    } else {
+      durations[i] <- breaks[i + 1] - breaks[i]
+    }
+  }
+
+  return(durations)
+}
+
+durations <- calculate_time_band_durations(time_bands)
+names(durations) <- time_bands$labels
+durations
+
+
