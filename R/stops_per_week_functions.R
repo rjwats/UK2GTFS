@@ -470,29 +470,5 @@ internal_trips_per_zone <- function(x, by_mode = TRUE, days_tot, time_bands){
 
 
 
-calculate_time_band_durations <- function(time_bands) {
-  breaks <- time_bands$breaks
-  labels <- time_bands$labels
-
-  durations <- numeric(length(labels))
-
-  for (i in seq_along(labels)) {
-    if (labels[i] == "Night") {
-      if (i == 1) {
-        durations[i] <- breaks[i + 1] - breaks[i]
-      } else {
-        durations[i] <- 24 - (breaks[i - 1] %% 24) + (breaks[i] %% 24)
-      }
-    } else {
-      durations[i] <- breaks[i + 1] - breaks[i]
-    }
-  }
-
-  return(durations)
-}
-
-durations <- calculate_time_band_durations(time_bands)
-names(durations) <- time_bands$labels
-durations
 
 
