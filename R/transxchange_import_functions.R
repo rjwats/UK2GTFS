@@ -189,10 +189,29 @@ import_services <- function(service, full_import = TRUE) {
   }
   Description <- xml2::xml_text(xml2::xml_find_first(service, ".//d1:Description"))
   RegisteredOperatorRef <- import_simple(service, ".//d1:RegisteredOperatorRef")
+  
   StartDate <- xml2::xml_text(xml2::xml_find_first(service, ".//d1:StartDate"))
+  if (length(StartDate) == 0) {
+    StartDate <- rep(NA, length(ServiceCode))
+  }
+  
   EndDate <- xml2::xml_text(xml2::xml_find_first(service, ".//d1:EndDate"))
-  DaysOfWeek <- paste(xml2::xml_name(xml2::xml_children(xml2::xml_find_first(service, ".//d1:DaysOfWeek"))), collapse = " ")
+  if (length(EndDate) == 0) {
+    EndDate <- rep(NA, length(ServiceCode))
+  }
+
+  days_of_week_node <- xml2::xml_find_first(service, ".//d1:DaysOfWeek")
+  if (length(days_of_week_node) > 0 && !is.na(days_of_week_node)) {
+    DaysOfWeek <- paste(xml2::xml_name(xml2::xml_children(days_of_week_node)), collapse = " ")
+  } else {
+    DaysOfWeek <- rep(NA, length(ServiceCode))
+  }
+
   StopRequirements <- import_simple(service, ".//d1:StopRequirements")
+  if (length(StopRequirements) == 0) {
+    StopRequirements <- rep(NA, length(ServiceCode))
+  }
+
   Origin <- import_simple_xml(service, ".//d1:Origin")
   Destination <- import_simple_xml(service, ".//d1:Destination")
   LineName <- import_simple(service, ".//d1:LineName")
