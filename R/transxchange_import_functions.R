@@ -185,7 +185,7 @@ import_services <- function(service, full_import = TRUE) {
   ServiceCode <- import_simple(service, ".//d1:ServiceCode")
   Mode <- import_simple(service, ".//d1:Mode")
   if (length(Mode) == 0) {
-    Mode <- NA_character_
+    Mode <- rep(NA, length(ServiceCode))
   }
   Description <- xml2::xml_text(xml2::xml_find_first(service, ".//d1:Description"))
   RegisteredOperatorRef <- import_simple(service, ".//d1:RegisteredOperatorRef")
