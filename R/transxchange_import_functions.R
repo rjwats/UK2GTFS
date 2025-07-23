@@ -297,23 +297,60 @@ import_services <- function(service, full_import = TRUE) {
     JourneyPatternID = JourneyPatternID
   )
 
-  Services_main <- data.frame(
-    ServiceCode = ServiceCode,
-    # PrivateCode = PrivateCode,
-    Mode = Mode,
-    Description = Description,
-    RegisteredOperatorRef = RegisteredOperatorRef,
-    StartDate = as.Date(StartDate),
-    EndDate = as.Date(EndDate),
-    DaysOfWeek = DaysOfWeek,
-    StopRequirements = StopRequirements,
-    Origin = Origin,
-    Destination = Destination,
-    LineName = LineName,
-    BankHolidayNonOperation = BankHolidayNonOperation,
-    BankHolidayOperation = BankHolidayOperation,
-    stringsAsFactors = FALSE
-  )
+ Services_main <- tryCatch({
+    data.frame(
+      ServiceCode = ServiceCode,
+      # PrivateCode = PrivateCode,
+      Mode = Mode,
+      Description = Description,
+      RegisteredOperatorRef = RegisteredOperatorRef,
+      StartDate = as.Date(StartDate),
+      EndDate = as.Date(EndDate),
+      DaysOfWeek = DaysOfWeek,
+      StopRequirements = StopRequirements,
+      Origin = Origin,
+      Destination = Destination,
+      LineName = LineName,
+      BankHolidayNonOperation = BankHolidayNonOperation,
+      BankHolidayOperation = BankHolidayOperation,
+      stringsAsFactors = FALSE
+    )
+  }, error = function(e) {
+    # Log the lengths of all variables to help debug
+    cat("Error creating Services_main data frame:\n")
+    cat("ServiceCode length:", length(ServiceCode), "\n")
+    cat("Mode length:", length(Mode), "\n")
+    cat("Description length:", length(Description), "\n")
+    cat("RegisteredOperatorRef length:", length(RegisteredOperatorRef), "\n")
+    cat("StartDate length:", length(StartDate), "\n")
+    cat("EndDate length:", length(EndDate), "\n")
+    cat("DaysOfWeek length:", length(DaysOfWeek), "\n")
+    cat("StopRequirements length:", length(StopRequirements), "\n")
+    cat("Origin length:", length(Origin), "\n")
+    cat("Destination length:", length(Destination), "\n")
+    cat("LineName length:", length(LineName), "\n")
+    cat("BankHolidayNonOperation length:", length(BankHolidayNonOperation), "\n")
+    cat("BankHolidayOperation length:", length(BankHolidayOperation), "\n")
+    
+    # Also log the actual values for short vectors
+    cat("\nActual values:\n")
+    cat("ServiceCode:", paste(ServiceCode, collapse = ", "), "\n")
+    cat("Mode:", paste(Mode, collapse = ", "), "\n")
+    cat("Description:", paste(Description, collapse = ", "), "\n")
+    cat("RegisteredOperatorRef:", paste(RegisteredOperatorRef, collapse = ", "), "\n")
+    cat("StartDate:", paste(StartDate, collapse = ", "), "\n")
+    cat("EndDate:", paste(EndDate, collapse = ", "), "\n")
+    cat("DaysOfWeek:", paste(DaysOfWeek, collapse = ", "), "\n")
+    cat("StopRequirements:", paste(StopRequirements, collapse = ", "), "\n")
+    cat("Origin:", paste(Origin, collapse = ", "), "\n")
+    cat("Destination:", paste(Destination, collapse = ", "), "\n")
+    cat("LineName:", paste(LineName, collapse = ", "), "\n")
+    cat("BankHolidayNonOperation:", paste(BankHolidayNonOperation, collapse = ", "), "\n")
+    cat("BankHolidayOperation:", paste(BankHolidayOperation, collapse = ", "), "\n")
+    
+    # Re-throw the error
+    stop(e)
+  })
 
   if (full_import) {
     Services_main$PrivateCode <- PrivateCode
